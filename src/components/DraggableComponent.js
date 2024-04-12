@@ -1,37 +1,38 @@
-import React, { useEffect, useState } from "react";
-import Draggable from "react-draggable";
-
+import React, { useEffect, useState } from 'react';
+import Draggable from 'react-draggable';
+import NoteTextarea from './NoteTextarea';
 
 const DraggableComponent = () => {
+    const [notes, setNotes] = useState([]);
 
-    const [note, setNote] = useState([]);
+    const handleAddNote = () => {
+        const colors = ['#ff9999', '#99ff99', '#9999ff', '#ffff99', '#ff99ff'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        setNotes([...notes, { id: notes.length + 1, color: randomColor }]);
+    };
 
-    const handleChange = (e) => {
-        localStorage.setItem('note', JSON.stringify(e.target.value));
-        setNote(e.target.value);
+    const handleNoteChange = (id, content) => {
+        setNotes(notes.map(note => (note.id === id ? { ...note, context: content } : note)));
     }
 
     useEffect(() => {
-        const savedNote = localStorage.getItem('note');
-        if (savedNote) {
-            setNote(JSON.parse(savedNote));
-        }
+        setNotes([{ id: 1, color: '#ff9999' }]);
     }, [])
 
     return (
-        <Draggable>
-            <div style={{ width: '200px', height: '200px', backgroundColor: 'white', border: '1px solid white', borderRadius: '5px', padding: '20px', margin: '10px' }}
-            >
-                <textarea
-                    value={note}
-                    style={{ width: '100%', height: '100%', resize: 'none', border: 'none', outline: 'none', backgroundColor: 'transparent' }}
-                    onChange={handleChange}
-                    placeholder="Enter your note here"
-                >
-
-                </textarea>
-            </div>
-        </Draggable>
+        <div>
+            <button onClick={handleAddNote}>Add Draggable Div</button>
+            {notes.map(note => (
+                <Draggable key={note.id}>
+                    <div style={{ width: '200px', height: '200px', backgroundColor: note.color }}>
+                        <NoteTextarea
+                            handleNoteChange={(content) => handleNoteChange(content)}
+                            key={note.id}
+                            note={note} />
+                    </div>
+                </Draggable>
+            ))}
+        </div>
     );
 }
 
